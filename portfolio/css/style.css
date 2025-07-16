@@ -1,0 +1,449 @@
+
+/* Animated dot background */
+body {
+  margin: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: #0d0d0d;
+}
+
+/* Global Styling */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0e0e0e;
+  color: #d6d6d6;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+  scroll-behavior: smooth;
+}
+
+a {
+  color: #7f5af0;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+a:hover {
+  color: #00ffff;
+  text-decoration: underline;
+}
+
+header.nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.2rem 2rem;
+  background: #0e0e0e;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #222;
+}
+
+.nav .logo {
+  font-weight: bold;
+  color: #fff;
+}
+
+.nav nav a {
+  margin-left: 20px;
+  font-weight: 500;
+}
+
+.nav nav a.active {
+  color: #00ffff;
+  border-bottom: 2px solid #00ffff;
+}
+
+/* Home */
+.home-container {
+  padding: 4rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.intro h1 {
+  font-size: 2.5rem;
+}
+
+.highlight {
+  color: #00ffff;
+}
+
+.tagline {
+  font-style: italic;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  color: #aaa;
+}
+
+.typewriter {
+  font-family: monospace;
+  color: #7f5af0;
+}
+
+/* About */
+.about h2 {
+  margin-top: 3rem;
+}
+
+.tech-stack {
+  margin-top: 1.5rem;
+}
+.tech-stack span {
+  display: inline-block;
+  margin: 0.3rem;
+  padding: 0.5rem 1rem;
+  background: #1a1a1a;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+/* Projects */
+.projects-container {
+  padding: 3rem 2rem;
+  max-width: 900px;
+  margin: auto;
+}
+.project-card {
+  background: #1a1a1a;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #7f5af0;
+  transition: 0.3s;
+}
+.project-card:hover {
+  border-left-color: #00ffff;
+}
+
+/* Contact */
+.contact-container {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.contact-links a {
+  display: inline-block;
+  margin: 0.5rem 1rem;
+  padding: 0.5rem 1.2rem;
+  border: 1px solid #7f5af0;
+  border-radius: 5px;
+  transition: 0.3s ease;
+}
+.contact-links a:hover {
+  background: #7f5af0;
+  color: #fff;
+}
+
+
+
+
+/* Games Page Styling */
+
+.games-container {
+  padding: 3rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.games-container h1 {
+  font-size: 2.2rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.games-container p {
+  color: #aaaaaa;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.game-card {
+  background-color: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  border-left: 4px solid #7f5af0;
+  transition: all 0.3s ease;
+}
+
+.game-card:hover {
+  border-left-color: #00ffff;
+  transform: translateX(5px);
+}
+
+.game-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.game-card p {
+  color: #bbbbbb;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.game-card a {
+  display: inline-block;
+  margin-right: 1rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1.2rem;
+  background-color: transparent;
+  border: 1px solid #7f5af0;
+  border-radius: 4px;
+  color: #7f5af0;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+
+.game-card a:hover {
+  background-color: #7f5af0;
+  color: #0e0e0e;
+  border-color: #00ffff;
+}
+.iframe-wrapper {
+  margin-top: 1rem;
+  border: 2px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+iframe {
+  display: block;
+  width: 100%;
+  border: none;
+}
+.edu-line {
+  color: #aaaaaa;
+  font-size: 0.95rem;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+/* Games Page Specific Styles */
+
+.game-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.iframe-wrapper.centered-game {
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background: #0e0e0e;
+  border: 2px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 90%;
+}
+
+/* Game Wrappers */
+.iframe-wrapper.centered-game {
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background: #0e0e0e;
+  border: 2px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 90%;
+}
+
+/* Allow input immediately */
+.game-frame {
+  display: block;
+  width: 100%;
+  border: none;
+}
+.game-card h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.iframe-wrapper {
+  margin: 0 auto;
+  padding: 0;
+  background: #0e0e0e;
+  border: 2px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 90%;
+}
+.typewriter-font {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem; /* increased ~2px from base 1rem */
+  font-weight: bold;
+  color: #ccc;
+  letter-spacing: 0.5px;
+}
+/* Tech stack grid */
+.tech-stack-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+.tech-item {
+  flex: 0 0 90px;
+  text-align: center;
+  color: #ccc;
+}
+.tech-item img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1e1e1e;
+  padding: 8px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  transition: transform 0.3s;
+}
+.tech-item img:hover {
+  transform: scale(1.05);
+}
+.tech-item span {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.icon-title {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.icon-title.large {
+  width: 42px;  /* 1.75x of 24px */
+  height: 42px;
+}
+/* Game title left justify */
+.game-heading {
+  text-align: left;
+  font-size: 1.7rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Keep iframe style */
+.iframe-wrapper {
+  margin: 0 auto;
+  background: #0e0e0e;
+  border: 2px solid #222;
+  border-radius: 8px;
+  max-width: 90%;
+  overflow: hidden;
+}
+/* --- Dotted background styling on all pages --- */
+body {
+  background-color: #0d0d0d;
+  background-image:
+    radial-gradient(rgba(127, 90, 240, 0.5) 1px, transparent 1px);
+  background-size: 30px 30px;  /* adjust spacing as desired */
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #0d0d0d;
+  background-image: radial-gradient(rgba(127, 90, 240, 0.2) 1px, transparent 1px),
+                    radial-gradient(rgba(0, 255, 255, 0.2) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  color: #d6d6d6;
+}
+
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* Layout and spacing */
+.home-container {
+  padding: 4rem 4rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.edu-line {
+  color: #aaa;
+  font-size: 1rem;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Typewriter font */
+.typewriter-font {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Tech stack scroller */
+.tech-stack-scroller {
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 2rem auto;
+  padding: 1rem 0;
+}
+
+.tech-stack-track {
+  display: inline-flex;
+  animation: scroll-left 16s linear infinite; /* 2x faster than before */
+}
+
+.tech-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 36px; /* increased spacing between items */
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.tech-item img {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #1e1e1e;
+  padding: 8px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  transition: transform 0.3s;
+}
+
+.tech-item img:hover {
+  transform: scale(1.05);
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.typewriter {
+  min-height: 1.5em;  /* Already added – keeps layout stable */
+  display: inline-block;
+}

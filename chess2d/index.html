@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      background: #000000ff;
+      color: #eee;
+      text-align: center;
+      font-family: sans-serif;
+      margin: 0;
+    }
+    #reset-btn {
+      margin: 16px auto;
+      padding: 2px 2px;
+      font-size: 18px;
+      background: #000;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      display: block;
+    }
+    #phaser-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+</head>
+<body>
+  <button id="reset-btn">Reset</button>
+  <div id="phaser-container"></div>
+  <script>
+    // Adjust tile size and filenames here
+    const TILE_SIZE = 48;   // Scale up for easy click/touch (use 16 for raw size)
+    const PIECE_ASSETS = {
+      wp: 'wp.png', wn: 'wn.png', wb: 'wb.png', wr: 'wr.png', wq: 'wq.png', wk: 'wk.png',
+      bp: 'bp.png', bn: 'bn.png', bb: 'bb.png', br: 'br.png', bq: 'bq.png', bk: 'bk.png'
+    };
+
+
+    // Initial Board Setup (ranks are reversed since our array is [y][x])
+    const START_BOARD = [
+      ['br','bn','bb','bq','bk','bb','bn','br'],
+      ['bp','bp','bp','bp','bp','bp','bp','bp'],
+      ['' ,'',  '',  '',  '',  '',  '',  ''],
+      ['' ,'',  '',  '',  '',  '',  '',  ''],
+      ['' ,'',  '',  '',  '',  '',  '',  ''],
+      ['' ,'',  '',  '',  '',  '',  '',  ''],
+      ['wp','wp','wp','wp','wp','wp','wp','wp'],
+      ['wr','wn','wb','wq','wk','wb','wn','wr']
+    ];
+
+
+    function cloneBoard(b) { return b.map(row => row.slice()); }
+
+
+    function cpuMove(board) {
+      const moves = getAllLegalMoves(board, 'b');
+      if (moves.length === 0) return null;
+      const captures = moves.filter(mv => mv.captured);
+      const isCapture = captures.length > 0 && Math.random() < 0.6;
+      const chosen = isCapture ? captures[Math.floor(Math.random()*captures.length)] :
+                                 moves[Math.floor(Math.random()*moves.length)];
+      return chosen;
+    }
+
+
+    function getAllLegalMoves(board, color) {
+      const moves = [];
+      for (let y=0; y<8; ++y) for (let x=0; x<8; ++x) {
+        const code = board[y][x];
+        if (!code || code[0] !== color) continue;
+        getLegalMovesForPiece(board, x, y).forEach(m => moves.push(m));
+      }
+      return moves;
+    }
+
+
+    function getLegalMovesForPiece(board, x, y) {
+      const code = board[y][x];
+      if (!code) return [];
+      const color = code[0], type = code[1];
+      const sign = color === 'w' ? -1 : 1;
+      let moves = [];
+
+
+      function push(nx,ny,captured) {
+        if (nx<0||nx>7||ny<0||ny>7) return;
+        const tgt = board[ny][nx];
+        if (tgt && tgt[0] === color) return;
+        moves.push({from: [x,y], to: [nx,ny], piece: code, captured: tgt });
+      }
+      function slide(dx,dy) {
+        let nx = x+dx, ny = y+dy;
+        while(nx>=0&&nx<8&&ny>=0&&ny<8) {
+          const tgt = board[ny][nx];
+          if (!tgt) push(nx,ny,null);
+          else {
+            if (tgt[0] !== color) push(nx,ny,tgt);
+            break;
+          }
+          nx += dx; ny += dy;
+        }
+      }
+
+
+      switch(type) {
+        case 'p': // pawn
+          if (board[y+sign]?.[x] === '') push(x, y+sign, null);
+          if (((color==='w'&&y===6)||(color==='b'&&y===1)) && board[y+sign]?.[x] === '' && board[y+2*sign]?.[x] === '') push(x, y+2*sign, null);
+          if (x>0 && board[y+sign]?.[x-1] && board[y+sign][x-1][0] !== color) push(x-1, y+sign, board[y+sign][x-1]);
+          if (x<7 && board[y+sign]?.[x+1] && board[y+sign][x+1][0] !== color) push(x+1, y+sign, board[y+sign][x+1]);
+          break;
+        case 'r': for (let d of [[1,0],[-1,0],[0,1],[0,-1]]) slide(...d); break;
+        case 'n':
+          for (let [dx,dy] of [[-2,-1],[-1,-2],[1,-2],[2,-1],[2,1],[1,2],[-1,2],[-2,1]]) push(x+dx,y+dy,board[y+dy]?.[x+dx]);
+          break;
+        case 'b': for (let d of [[1,1],[1,-1],[-1,1],[-1,-1]]) slide(...d); break;
+        case 'q': for (let d of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]) slide(...d); break;
+        case 'k':
+          for(let dx=-1;dx<=1;dx++) for(let dy=-1;dy<=1;dy++) if(dx||dy) push(x+dx,y+dy,board[y+dy]?.[x+dx]);
+          break;
+      }
+      return moves;
+    }
+
+
+    let game, chessState = null;
+    let gameScene;
+
+
+    function launchChessGame() {
+      if(game) { game.destroy(true); }
+      chessState = {
+        board: cloneBoard(START_BOARD),
+        turn: 'w',
+        selected: null,
+        legal: [],
+        over: false
+      };
+      const config = {
+        type: Phaser.AUTO,
+        width: TILE_SIZE * 8,
+        height: TILE_SIZE * 8,
+        parent: 'phaser-container',
+        backgroundColor: '#13181F',
+        scene: {
+          preload: preload,
+          create: create,
+          update: update
+        }
+      };
+      game = new Phaser.Game(config);
+    }
+
+
+    function preload() {
+      this.load.image('tile', 'tile.png');
+      for (const k in PIECE_ASSETS) { this.load.image(k, PIECE_ASSETS[k]); }
+    }
+
+
+    function create() {
+      gameScene = this;
+      drawBoard(this);
+      inputSetup(this);
+      if (chessState.turn === 'b') aiMove();
+    }
+
+
+    function update() {}
+
+
+    function drawBoard(scene) {
+      scene.children.removeAll();
+      for(let y=0;y<8;y++) for(let x=0;x<8;x++) {
+        let shade = (x+y)%2===0 ? 0xffffff : 0xaaaaaa;
+        let tileSpr = scene.add.image(x*TILE_SIZE+TILE_SIZE/2, y*TILE_SIZE+TILE_SIZE/2, 'tile').setDisplaySize(TILE_SIZE,TILE_SIZE);
+        tileSpr.setTint(shade);
+        tileSpr.setData({ x, y, kind: 'tile' });
+        tileSpr.setInteractive();
+        tileSpr.on('pointerdown', ()=>onTileClick(x,y));
+        if(chessState.selected && chessState.legal.some(m=>m.to[0]==x && m.to[1]==y))
+          tileSpr.setTint(0x88ee88);
+      }
+      for(let y=0;y<8;y++) for(let x=0;x<8;x++) {
+        const p = chessState.board[y][x];
+        if(!p) continue;
+        let spr = scene.add.image(x*TILE_SIZE+TILE_SIZE/2, y*TILE_SIZE+TILE_SIZE/2, p)
+          .setDisplaySize(TILE_SIZE,TILE_SIZE);
+        spr.setData({ x, y, code: p, kind: 'piece' });
+        spr.setInteractive();
+        spr.on('pointerdown', ()=>onPieceClick(x,y));
+        if(chessState.selected && chessState.selected[0]==x && chessState.selected[1]==y)
+          spr.setTint(0xeddd3d);
+      }
+    }
+
+
+    function inputSetup(scene) {
+    }
+
+
+    function onPieceClick(x,y) {
+      if(chessState.over) return;
+      const code = chessState.board[y][x];
+      if(!code) return;
+      const color = code[0];
+      if(color !== chessState.turn) return;
+      chessState.selected = [x,y];
+      chessState.legal = getLegalMovesForPiece(chessState.board, x, y).filter(mv=> {
+        const next = cloneBoard(chessState.board);
+        next[mv.to[1]][mv.to[0]] = code;
+        next[y][x] = '';
+        if (next[mv.to[1]][mv.to[0]]==='wk' || next[mv.to[1]][mv.to[0]]==='bk') return false;
+        return true;
+      });
+      drawBoard(gameScene);
+    }
+
+
+    function onTileClick(x,y) {
+      if(chessState.over) return;
+      if(!chessState.selected) return;
+      const move = chessState.legal.find(m => m.to[0]===x && m.to[1]===y);
+      if(!move) return;
+      chessState.board[y][x] = move.piece;
+      chessState.board[move.from[1]][move.from[0]] = '';
+      chessState.selected = null;
+      chessState.legal = [];
+      if(move.piece==='wp' && y===0) chessState.board[y][x] = 'wq';
+      if(move.piece==='bp' && y===7) chessState.board[y][x] = 'bq';
+      chessState.turn = chessState.turn === 'w' ? 'b' : 'w';
+      const moves = getAllLegalMoves(chessState.board, chessState.turn);
+      if(moves.length===0) {
+        chessState.over = true;
+        alert("Game Over — "+ (chessState.turn === 'w' ? "Black" : "White") + " wins or stalemate.");
+      }
+      drawBoard(gameScene);
+      if(!chessState.over && chessState.turn === 'b') {
+        setTimeout(aiMove, 400);
+      }
+    }
+
+
+    function aiMove() {
+      if(chessState.over) return;
+      const mv = cpuMove(chessState.board);
+      if(!mv) {
+        chessState.over = true;
+        alert("Game Over — Draw or stalemate.");
+        return;
+      }
+      chessState.board[mv.to[1]][mv.to[0]] = mv.piece;
+      chessState.board[mv.from[1]][mv.from[0]] = '';
+      if(mv.piece==='bp' && mv.to[1]===7) chessState.board[mv.to[1]][mv.to[0]] = 'bq';
+      chessState.turn = 'w';
+      drawBoard(gameScene);
+      const moves = getAllLegalMoves(chessState.board, 'w');
+      if(moves.length===0) {
+        chessState.over = true;
+        alert("Game Over — Black wins or stalemate.");
+      }
+    }
+
+
+    document.getElementById('reset-btn').onclick = launchChessGame;
+    window.onload = launchChessGame;
+  </script>
+</body>
+</html>
